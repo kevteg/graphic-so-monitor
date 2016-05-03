@@ -68,35 +68,48 @@ string engi::mem_swap_free(){
   return return_value;
 }
 string engi::disk_list(){
-  string return_value = "disk list";
+  string return_value = exec("lsblk -d -n");
   return return_value;
 }
 string engi::partitions_list(){
-  string return_value = "partitions list";
+  string return_value = exec("lsblk -n");
   return return_value;
 }
 string engi::net_list(){
-  string return_value = "net list";
+  string return_value = exec("ip link");
   return return_value;
 }
 string engi::net_list_ip(){
-  string return_value = "net list ip";
+  string return_value = exec("ip addr");
   return return_value;
 }
 string engi::disk_space(){
-  string return_value = "disk space";
+  string return_value = exec("df -h");
   return return_value;
 }
 string engi::current_user(){
-  string return_value = "current user";
+  string return_value = exec("whoami");
   return return_value;
 }
 string engi::date_time(){
-  string return_value = "date time";
+  string return_value = exec("date");
   return return_value;
 }
 string engi::uptime(){
-  string return_value = "uptime";
+  int index = 0;
+  string return_value = exec("uptime -p");
+  index = return_value.find("hour", index);
+  if(!(index == std::string::npos))
+    return_value.replace(index, 5, "horas");
+    index = return_value.find("hour", index);
+  index = 0;
+  index = return_value.find("minutes", index);
+  if(!(index == std::string::npos))
+    return_value.replace(index, 7, "minutos");
+  index = 0;
+  index = return_value.find("up", index);
+  if(!(index == std::string::npos))
+    return_value.replace(index, 2, "");
   return return_value;
 }
 
