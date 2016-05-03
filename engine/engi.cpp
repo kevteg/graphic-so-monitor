@@ -19,6 +19,10 @@ string engi::execute(){
     execution = mem_total();
   else if(command == "--mem_total_free")
     execution = mem_total_free();
+  else if(command == "--mem_swap")
+    execution = mem_swap();
+  else if(command == "--mem_swap_free")
+    execution = mem_swap_free();
   else if(command == "--disk_list")
     execution = disk_list();
   else if(command == "--partitions_list")
@@ -48,19 +52,19 @@ string engi::running_processes(){
   return return_value;
 }
 string engi::mem_total(){
-  string return_value = "mem total";
+  string return_value = exec("cat /proc/meminfo | grep MemTotal | grep -Eo '[0-9]{0,9}'");
   return return_value;
 }
 string engi::mem_total_free(){
-  string return_value = "mem total free";
+  string return_value = exec("cat /proc/meminfo | grep MemAvailable | grep -Eo '[0-9]{0,9}'");
   return return_value;
 }
 string engi::mem_swap(){
-  string return_value = "mem swap";
+  string return_value = exec("cat /proc/meminfo | grep SwapTotal | grep -Eo '[0-9]{0,9}'");
   return return_value;
 }
 string engi::mem_swap_free(){
-  string return_value = "mem swap free";
+  string return_value = exec("cat /proc/meminfo | grep SwapFree | grep -Eo '[0-9]{0,9}'");
   return return_value;
 }
 string engi::disk_list(){
@@ -95,7 +99,6 @@ string engi::uptime(){
   string return_value = "uptime";
   return return_value;
 }
-
 
 string engi::exec(const char* cmd) {
     char buffer[128];
