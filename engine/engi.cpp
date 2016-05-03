@@ -52,20 +52,28 @@ string engi::running_processes(){
   return return_value;
 }
 string engi::mem_total(){
-  string return_value = exec("cat /proc/meminfo | grep MemTotal | grep -Eo '[0-9]{0,9}'");
-  return return_value;
+  std::ostringstream strs;
+  double ngb = stod(exec("cat /proc/meminfo | grep MemTotal | grep -Eo '[0-9]{0,9}'"))/1024/1024;
+  strs << ngb;
+  return strs.str() + "GB";
 }
 string engi::mem_total_free(){
-  string return_value = exec("cat /proc/meminfo | grep MemAvailable | grep -Eo '[0-9]{0,9}'");
-  return return_value;
+  std::ostringstream strs;
+  double ngb = stod(exec("cat /proc/meminfo | grep MemAvailable | grep -Eo '[0-9]{0,9}'"))/1024/1024;
+  strs << ngb;
+  return strs.str() + "GB";
 }
 string engi::mem_swap(){
-  string return_value = exec("cat /proc/meminfo | grep SwapTotal | grep -Eo '[0-9]{0,9}'");
-  return return_value;
+  std::ostringstream strs;
+  double ngb = stod(exec("cat /proc/meminfo | grep SwapTotal | grep -Eo '[0-9]{0,9}'"))/1024/1024;
+  strs << ngb;
+  return strs.str() + "GB";
 }
 string engi::mem_swap_free(){
-  string return_value = exec("cat /proc/meminfo | grep SwapFree | grep -Eo '[0-9]{0,9}'");
-  return return_value;
+  std::ostringstream strs;
+  double ngb = stod(exec("cat /proc/meminfo | grep SwapFree | grep -Eo '[0-9]{0,9}'"))/1024/1024;
+  strs << ngb;
+  return strs.str() + "GB";
 }
 string engi::disk_list(){
   string return_value = exec("lsblk -d -n");

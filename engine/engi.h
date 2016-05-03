@@ -1,6 +1,7 @@
 #ifndef  ENGI_H
 #define  ENGI_H
 #include <string>
+#include <sstream>
 #include <stdlib.h>
 #include <iostream>
 #include <stdio.h>
