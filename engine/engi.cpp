@@ -11,31 +11,31 @@ engi::engi(int argc, char *argv[]){
 }
 string engi::execute(){
   string execution = "Error: " + error_message;
-  if(command == "--kernel_version")
+  if(command == "--kernel-version")
     execution = kernel_version();
-  else if(command == "--running_processes")
+  else if(command == "--runnin-_processes")
     execution = running_processes();
-  else if(command == "--mem_total")
+  else if(command == "--mem-total")
     execution = mem_total();
-  else if(command == "--mem_total_free")
+  else if(command == "--mem-total-free")
     execution = mem_total_free();
-  else if(command == "--mem_swap")
+  else if(command == "--mem-swap")
     execution = mem_swap();
-  else if(command == "--mem_swap_free")
+  else if(command == "--mem-swap-free")
     execution = mem_swap_free();
-  else if(command == "--disk_list")
+  else if(command == "--disk-list")
     execution = disk_list();
-  else if(command == "--partitions_list")
+  else if(command == "--partitions-list")
     execution = partitions_list();
-  else if(command == "--net_list")
+  else if(command == "--net-list")
     execution = net_list();
-  else if(command == "--net_list_ip")//TODO: WINDOWS
+  else if(command == "--net-list-ip")
     execution = net_list_ip();
-  else if(command == "--disk_space")//TODO: WINDOWS
+  else if(command == "--disk-space")
     execution = disk_space();
-  else if(command == "--current_user")
+  else if(command == "--current-user")
     execution = current_user();
-  else if(command == "--date_time")
+  else if(command == "--date-time")
     execution = date_time();
   else if(command == "--uptime")
     execution = uptime();
