@@ -129,53 +129,61 @@ string engi::net_list(){
   return return_value;
 }
 string engi::net_list_ip(){
-  string interfaces = exec("ip addr show | grep -o \"^[0-9]:*\\ .\\+:\"");
-  string ips = exec("ip addr show | grep -o \"inet [0-9]*\\.[0-9]*\\.[0-9]*\\.[0-9]*\" | grep -o \"[0-9]*\\.[0-9]*\\.[0-9]*\\.[0-9]*\"");
-  string def_ip = "ninguna";
-  int saltos = 0;
-  int index = 0;
-  int saltos_ip = 0;
-  int index_ip = 0;
+  #ifdef __linux__
+    string interfaces = exec("ip addr show | grep -o \"^[0-9]:*\\ .\\+:\"");
+    string ips = exec("ip addr show | grep -o \"inet [0-9]*\\.[0-9]*\\.[0-9]*\\.[0-9]*\" | grep -o \"[0-9]*\\.[0-9]*\\.[0-9]*\\.[0-9]*\"");
+    string def_ip = "ninguna";
+    int saltos = 0;
+    int index = 0;
+    int saltos_ip = 0;
+    int index_ip = 0;
 
-  for (int i = 0; i < interfaces.length(); i++)
-    if(interfaces[i] == '\n')
-      saltos++;
+    for (int i = 0; i < interfaces.length(); i++)
+      if(interfaces[i] == '\n')
+        saltos++;
 
-  string vec_int[saltos];
-  for (int i = 0; i < saltos; i++)
-    vec_int[i] = "";
+    string vec_int[saltos];
+    for (int i = 0; i < saltos; i++)
+      vec_int[i] = "";
 
-  for (int i = 0; i < interfaces.length(); i++) {
-    if(interfaces[i] == '\n')
-      index++;
-    else
-      vec_int[index] += interfaces[i];
-  }
+    for (int i = 0; i < interfaces.length(); i++) {
+      if(interfaces[i] == '\n')
+        index++;
+      else
+        vec_int[index] += interfaces[i];
+    }
 
-  for (int i = 0; i < ips.length(); i++)
-    if(ips[i] == '\n')
-      saltos_ip++;
+    for (int i = 0; i < ips.length(); i++)
+      if(ips[i] == '\n')
+        saltos_ip++;
 
-  string vec_ips[saltos_ip];
-  for (int i = 0; i < saltos_ip; i++)
-    vec_ips[i] = "";
+    string vec_ips[saltos_ip];
+    for (int i = 0; i < saltos_ip; i++)
+      vec_ips[i] = "";
 
-  for (int i = 0; i < ips.length(); i++) {
-    vec_ips[index_ip] += ips[i];
-    if(ips[i] == '\n')
-      index_ip++;
-  }
-  int pos = saltos_ip - 1;
+    for (int i = 0; i < ips.length(); i++) {
+      vec_ips[index_ip] += ips[i];
+      if(ips[i] == '\n')
+        index_ip++;
+    }
+    int pos = saltos_ip - 1;
 
-  for(int i = saltos - 1; i >= 0 ; i--) {
-    string str = (pos >= 0)?vec_ips[pos--]:def_ip;
-    cout << vec_int[i] << " " << str;
-  }
-
-  return "";
+    for(int i = saltos - 1; i >= 0 ; i--) {
+      string str = (pos >= 0)?vec_ips[pos--]:def_ip;
+      cout << vec_int[i] << " " << str;
+    }
+    return "";
+  #elif _WIN32
+    string return_value = exec("IPCONFIG | FINDSTR /R \"Adaptador* Dirección* .*[0-9][0-9]*\\.[0-9][0-9]*\\.[0-9][0-9]*\\.[0-9][0-9]*\"");
+    return return_value;
+  #endif
 }
 string engi::disk_space(){
-  string return_value = exec("df -h");
+  #ifdef __linux__
+    string return_value = exec("df -h");
+  #elif _WIN32
+    string return_value = exec("wmic /node:\"%COMPUTERNAME%\" LogicalDisk Where DriveType=\"3\" Get DeviceID,FreeSpace");
+  #endif
   return return_value;
 }
 string engi::current_user(){
