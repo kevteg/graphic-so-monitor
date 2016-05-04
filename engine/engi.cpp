@@ -29,9 +29,9 @@ string engi::execute(){
     execution = partitions_list();
   else if(command == "--net_list")
     execution = net_list();
-  else if(command == "--net_list_ip")
+  else if(command == "--net_list_ip")//TODO: WINDOWS
     execution = net_list_ip();
-  else if(command == "--disk_space")
+  else if(command == "--disk_space")//TODO: WINDOWS
     execution = disk_space();
   else if(command == "--current_user")
     execution = current_user();
@@ -44,48 +44,88 @@ string engi::execute(){
 }
 
 string engi::kernel_version(){
-  string return_value = exec("uname -r");
+	string return_value;
+  #ifdef __linux__
+    return_value = exec("uname -r");
+  #elif _WIN32
+    return_value = exec("ver");
+  #endif
   return return_value;
 }
+
 string engi::running_processes(){
-  string return_value = exec("ps -ax --no-headers | wc -l");
+  string return_value;
+  #ifdef __linux__
+    return_value = exec("ps -ax --no-headers | wc -l");
+  #elif _WIN32
+    return_value = exec("tasklist | find /c \"KB\" ");
+  #endif
   return return_value;
 }
+
 string engi::mem_total(){
   std::ostringstream strs;
-  double ngb = stod(exec("cat /proc/meminfo | grep MemTotal | grep -Eo '[0-9]{0,9}'"))/1024/1024;
+  #ifdef __linux__
+    double ngb = stod(exec("cat /proc/meminfo | grep MemTotal | grep -Eo '[0-9]{0,9}'"))/1024/1024;
+  #elif _WIN32
+    double ngb = stod(exec("wmic computersystem get TotalPhysicalMemory | findstr /R /I /C:\"^[1-9].*\""))/1024/1024/1024;
+  #endif
   strs << ngb;
   return strs.str() + "GB";
 }
 string engi::mem_total_free(){
   std::ostringstream strs;
-  double ngb = stod(exec("cat /proc/meminfo | grep MemAvailable | grep -Eo '[0-9]{0,9}'"))/1024/1024;
+  #ifdef __linux__
+    double ngb = stod(exec("cat /proc/meminfo | grep MemAvailable | grep -Eo '[0-9]{0,9}'"))/1024/1024;
+  #elif _WIN32
+    double ngb = stod(exec("wmic os get freephysicalmemory | findstr /R /I /C:\"^[1-9].*\""))/1024/1024;//según vi en taskmgr es así
+  #endif
   strs << ngb;
   return strs.str() + "GB";
 }
 string engi::mem_swap(){
   std::ostringstream strs;
-  double ngb = stod(exec("cat /proc/meminfo | grep SwapTotal | grep -Eo '[0-9]{0,9}'"))/1024/1024;
+  #ifdef __linux__
+    double ngb = stod(exec("cat /proc/meminfo | grep SwapTotal | grep -Eo '[0-9]{0,9}'"))/1024/1024;
+  #elif _WIN32
+    double ngb = stod(exec("wmic os get TotalVirtualMemorySize | findstr /R /I /C:\"^[1-9].*\""))/1024/1024;
+  #endif
   strs << ngb;
   return strs.str() + "GB";
 }
 string engi::mem_swap_free(){
   std::ostringstream strs;
-  double ngb = stod(exec("cat /proc/meminfo | grep SwapFree | grep -Eo '[0-9]{0,9}'"))/1024/1024;
+  #ifdef __linux__
+    double ngb = stod(exec("cat /proc/meminfo | grep SwapFree | grep -Eo '[0-9]{0,9}'"))/1024/1024;
+  #elif _WIN32
+    double ngb = stod(exec("wmic os get FreeVirtualMemory | findstr /R /I /C:\"^[1-9].*\""))/1024/1024;
+  #endif
   strs << ngb;
   return strs.str() + "GB";
 }
 string engi::disk_list(){
-  string return_value = exec("lsblk -d -n -o NAME");
+  #ifdef __linux__
+    string return_value = exec("lsblk -d -n -o NAME");
+  #elif _WIN32
+    string return_value = exec("wmic diskdrive get name,model");
+  #endif
+
   return return_value;
 }
 string engi::partitions_list(){
-  string return_value = exec("lsblk -n -o NAME");
+  #ifdef __linux__
+    string return_value = exec("lsblk -n -o NAME");
+  #elif _WIN32
+    string return_value = exec("wmic partition get name,type");
+  #endif
   return return_value;
 }
 string engi::net_list(){
-  string return_value = exec("ip addr show | grep -o \"^[0-9]:*\\ .\\+:\"");
-
+  #ifdef __linux__
+    string return_value = exec("ip addr show | grep -o \"^[0-9]:*\\ .\\+:\"");
+  #elif _WIN32
+    string return_value = exec("netsh interface ip show interfaces");
+  #endif
   return return_value;
 }
 string engi::net_list_ip(){
@@ -143,24 +183,56 @@ string engi::current_user(){
   return return_value;
 }
 string engi::date_time(){
-  string return_value = exec("date");
+  string return_value;
+  #ifdef __linux__
+    return_value = exec("date");
+  #elif _WIN32
+    string day = exec("date /t");
+    string hour = exec("time /t");
+    return_value = day + hour;
+  #endif
   return return_value;
 }
 string engi::uptime(){
   int index = 0;
-  string return_value = exec("uptime -p");
-  index = return_value.find("hour", index);
-  if(!(index == std::string::npos))
-    return_value.replace(index, 5, "horas");
+  #ifdef __linux__
+    string return_value = exec("uptime -p");
     index = return_value.find("hour", index);
+    if(!(index == std::string::npos))
+      return_value.replace(index, 5, "horas");
+    index = 0;
+    index = return_value.find("minutes", index);
+    if(!(index == std::string::npos))
+      return_value.replace(index, 7, "minutos");
+    index = 0;
+    index = return_value.find("up", index);
+    if(!(index == std::string::npos))
+      return_value.replace(index, 2, "");
+  #elif _WIN32
+    string return_value = exec("uptime");
+    index = return_value.find("hour(s)", index);
+    if(!(index == std::string::npos))
+      return_value.replace(index, 7, "horas");
+    index = 0;
+    index = return_value.find("minute(s)", index);
+    if(!(index == std::string::npos))
+      return_value.replace(index, 9, "minutos");
+    index = 0;
+    index = return_value.find("second(s)", index);
+    if(!(index == std::string::npos))
+      return_value.replace(index, 9, "segundos");
+    index = 0;
+    index = return_value.find("day(s)", index);
+    if(!(index == std::string::npos))
+      return_value.replace(index, 6, "dias");
+    index = 0;
+    index = return_value.find("for:", index);
+    if(!(index == std::string::npos))
+      return_value.replace(0, index + 4, "");
+  #endif
+
   index = 0;
-  index = return_value.find("minutes", index);
-  if(!(index == std::string::npos))
-    return_value.replace(index, 7, "minutos");
-  index = 0;
-  index = return_value.find("up", index);
-  if(!(index == std::string::npos))
-    return_value.replace(index, 2, "");
+
   return return_value;
 }
 

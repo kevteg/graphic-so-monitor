@@ -9,13 +9,6 @@
 #include <memory>
 #include <stdexcept>
 
-#ifdef _WIN32
-  #include <conio.h>
-  #include <windows.h>
-  #include <tchar.h>
-  #include <strsafe.h>
-#endif
-
 using namespace std;
 class engi{
   public:
