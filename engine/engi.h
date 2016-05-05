@@ -31,6 +31,7 @@ class engi{
     string uptime();
     string exec(const char* cmd);
     string error_message;
+    string external;
     bool error;
     string command;
     //TODO: Aqui van metodos que revisan todas las cosas

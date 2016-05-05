@@ -3,17 +3,21 @@ engi::engi(int argc, char *argv[]){
   error_message = "No existe ese comando";
   error = false;
   command = "";
+  external = "";
+
   if(argc < 2){
     error = true;
     error_message = "Debe especificar un comando";
   }else
       command = argv[1];
+      if(argc == 3)
+        external = argv[2];
 }
 string engi::execute(){
   string execution = "Error: " + error_message;
   if(command == "--kernel-version")
     execution = kernel_version();
-  else if(command == "--runnin-_processes")
+  else if(command == "--running-processes")
     execution = running_processes();
   else if(command == "--mem-total")
     execution = mem_total();
@@ -39,9 +43,19 @@ string engi::execute(){
     execution = date_time();
   else if(command == "--uptime")
     execution = uptime();
+  else if(command == "--ext")
+    execution = exec(external.c_str());
+  else if(command == "--pid"){
+    string com =  "ps -ef | awk '$NF~\"" + external + "\"{print $2}'";
+    execution = exec(com.c_str());
+  }else if(command == "--kill"){
+    string com =  "ps aux | grep -i " + external + " | awk {'print $2'} | xargs kill -9";
+    execution = exec(com.c_str());
+  }
 
   return execution;
 }
+
 
 string engi::kernel_version(){
 	string return_value;
